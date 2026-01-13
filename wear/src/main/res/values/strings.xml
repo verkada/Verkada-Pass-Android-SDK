@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">wear</string>
+    <!--
+    This string is used for square devices and overridden by hello_world in
+    values-round/strings.xml for round devices.
+    -->
+    <string name="launcher_activity_text">Verkada Pass\n BLE Client App</string>
+    <string name="notification_channel_name">Verkada Pass Notification</string>
+    <string name="notification_channel_description">Verkada Pass Notification Channel</string>
+    <string name="service_notification_title">Verkada Pass Service</string>
+    <string name="service_notification_text">The service is running</string>
+</resources>
