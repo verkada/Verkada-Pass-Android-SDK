@@ -1,7 +1,8 @@
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.google.devtools.ksp)
+    alias(libs.plugins.google.dagger.hilt.android)
 }
 
 android {
@@ -29,11 +30,10 @@ android {
         }
     }
     compileOptions {
+        isCoreLibraryDesugaringEnabled = true
+
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
-    }
-    kotlinOptions {
-        jvmTarget = "11"
     }
     useLibrary("wear-sdk")
     buildFeatures {
@@ -45,7 +45,12 @@ dependencies {
     implementation(libs.androidx.compose.material)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.core.splashscreen)
+    implementation(libs.google.dagger.hilt.android)
+
+    coreLibraryDesugaring(libs.android.tools.desugar)
 
     implementation(libs.verkada.pass.ble)
+    ksp(libs.google.dagger.hilt.android.compiler)
+
     implementation(project(":core"))
 }
