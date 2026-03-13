@@ -20,7 +20,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import com.verkada.android.pass.sdk.ble.BleService
+import com.verkada.android.pass.sdk.ble.VerkadaPassBle
 import com.verkada.pass.client.core.Notifications
 import com.verkada.pass.client.mobile.ui.theme.VerkadaPassAndroidClientTheme
 
@@ -57,7 +57,7 @@ class ClientActivity : ComponentActivity() {
 
                 val notification = buildServiceNotification()
 
-                BleService.start(
+                VerkadaPassBle.start(
                     context = this,
                     notificationId = 1,
                     notification = notification

@@ -14,6 +14,7 @@ pluginManagement {
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
+        mavenLocal()
         google()
         mavenCentral()
         maven { url = uri("https://www.jitpack.io") }
@@ -22,7 +23,7 @@ dependencyResolutionManagement {
 
 rootProject.name = "Verkada-Pass-Android-SDK-Sample"
 
-includeBuild("../Verkada-Pass-Android-SDK")
+//includeBuild("../Verkada-Pass-Android-SDK")
 include(":mobile")
 include(":core")
 include(":wear")

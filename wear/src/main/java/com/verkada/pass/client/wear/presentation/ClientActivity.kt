@@ -1,8 +1,3 @@
-/* While this template provides a good starting point for using Wear Compose, you can always
- * take a look at https://github.com/android/wear-os-samples/tree/main/ComposeStarter to find the
- * most up to date changes to the libraries and their usages.
- */
-
 package com.verkada.pass.client.wear.presentation
 
 import android.Manifest
@@ -27,7 +22,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
 import androidx.wear.compose.material.TimeText
-import com.verkada.android.pass.sdk.ble.BleService
+import com.verkada.android.pass.sdk.ble.VerkadaPassBle
 import com.verkada.pass.client.core.Notifications
 import com.verkada.pass.client.wear.R
 import com.verkada.pass.client.wear.presentation.theme.VerkadaPassAndroidClientTheme
@@ -54,7 +49,7 @@ class ClientActivity : ComponentActivity() {
 
                 val notification = buildServiceNotification()
 
-                BleService.start(
+                VerkadaPassBle.start(
                     context = this,
                     notificationId = 1,
                     notification = notification

@@ -9,6 +9,7 @@ activityCompose = "1.13.0"
 composeBom = "2026.03.00"
 composeMaterial = "1.5.6"
 coreSplashscreen = "1.2.0"
+verkada-pass-ble = "0.0.1-SNAPSHOT"
 
 [libraries]
 android-tools-desugar = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "android" }
@@ -20,7 +21,7 @@ androidx-compose-material = { group = "androidx.wear.compose", name = "compose-m
 androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "coreSplashscreen" }
 google-dagger-hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
 google-dagger-hilt-android-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hilt" }
-verkada-pass-ble = { module = "com.verkada.android.pass.sdk:ble" }
+verkada-pass-ble = { module = "com.verkada.android.pass.sdk:ble", version.ref = "verkada-pass-ble" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
