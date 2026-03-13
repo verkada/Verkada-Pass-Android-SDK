@@ -17,24 +17,6 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
         maven { url = uri("https://www.jitpack.io") }
-
-        // TODO(revert): Temporary for includeBuild(../Verkada-Pass-Android-SDK). Remove when SDK is consumed as a published artifact.
-        exclusiveContent {
-            forRepository {
-                maven {
-                    url = uri("https://maven.pkg.github.com/verkada/Verkada-Android-Library")
-                    credentials {
-                        val githubUsername: String? by settings
-                        val githubToken: String? by settings
-                        username = githubUsername ?: System.getenv("GITHUB_USERNAME")
-                        password = githubToken ?: System.getenv("GITHUB_TOKEN")
-                    }
-                }
-            }
-            filter {
-                includeGroupByRegex("com\\.verkada\\..*")
-            }
-        }
     }
 }
 
