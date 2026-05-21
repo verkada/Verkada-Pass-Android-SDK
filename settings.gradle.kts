@@ -73,7 +73,7 @@ dependencyResolutionManagement {
 
 rootProject.name = "Verkada-Pass-Android-SDK-Sample"
 
-//includeBuild("../Verkada-Pass-Android-SDK")
+includeBuild("../Verkada-Pass-Android-SDK")
 include(":mobile")
 include(":core")
 include(":wear")

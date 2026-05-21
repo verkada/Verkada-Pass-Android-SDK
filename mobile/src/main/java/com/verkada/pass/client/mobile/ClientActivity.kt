@@ -7,64 +7,79 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.Box
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import com.verkada.android.pass.sdk.ble.VerkadaPassBle
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.verkada.pass.client.core.Notifications
 import com.verkada.pass.client.mobile.ui.theme.VerkadaPassAndroidClientTheme
+import com.verkada.pass.client.mobile.ui.views.AppUiState
+import com.verkada.pass.client.mobile.ui.views.SdkInitScreen
+import com.verkada.pass.client.mobile.ui.views.SdkLoadingScreen
+import com.verkada.pass.client.mobile.ui.views.SdkReadyScreen
+import dagger.hilt.android.AndroidEntryPoint
+import kotlin.getValue
 
+@AndroidEntryPoint
 class ClientActivity : ComponentActivity() {
+
+    private val viewModel: ClientViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            VerkadaPassAndroidClientTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(it),
-                        contentAlignment = Alignment.Center
+
+            val context = LocalContext.current
+            val appState by viewModel.uiState.collectAsStateWithLifecycle()
+
+            LaunchedEffect(appState) {
+                if (appState is AppUiState.Ready) {
+                    if (ActivityCompat.checkSelfPermission(
+                            context,
+                            Manifest.permission.BLUETOOTH_CONNECT
+                        ) == PackageManager.PERMISSION_GRANTED
                     ) {
-                        Text(
-                            modifier = Modifier.fillMaxWidth(),
-                            textAlign = TextAlign.Center,
-                            text = stringResource(R.string.launcher_activity_text)
-                        )
+                        if (ActivityCompat.checkSelfPermission(
+                                context,
+                                Manifest.permission.POST_NOTIFICATIONS
+                            ) ==
+                            PackageManager.PERMISSION_GRANTED
+                        ) {
+                            val notification = buildServiceNotification()
+                            viewModel.startBleService(notification)
+                        }
                     }
                 }
             }
-        }
 
-        if (ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.BLUETOOTH_CONNECT
-            ) == PackageManager.PERMISSION_GRANTED
-        ) {
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) ==
-                PackageManager.PERMISSION_GRANTED) {
+            VerkadaPassAndroidClientTheme {
+                when (val state = appState) {
+                    is AppUiState.Initializing -> SdkInitScreen(
+                        state = state.sdkInit,
+                        onCopyChallenge = {},
+                        onTokenSubmit = viewModel::exchangeToken,
+                        modifier = Modifier.fillMaxSize(),
+                    )
 
-                val notification = buildServiceNotification()
+                    is AppUiState.Ready -> SdkReadyScreen(
+                        state = state.state,
+                        onRefreshDoors = viewModel::refreshDoors,
+                        onResetSdk = viewModel::resetSdk,
+                        modifier = Modifier.fillMaxSize(),
+                    )
 
-                VerkadaPassBle.start(
-                    context = this,
-                    notificationId = 1,
-                    notification = notification
-                )
+                    AppUiState.Unknown -> SdkLoadingScreen(
+                        modifier = Modifier.fillMaxSize(),
+                    )
+                }
             }
-
-            return
         }
     }
 

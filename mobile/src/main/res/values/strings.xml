@@ -1,8 +1,24 @@
 <resources>
-    <string name="app_name">mobile</string>
+    <string name="app_name">Pass SDK demo</string>
     <string name="launcher_activity_text">Verkada Pass\n BLE Client App</string>
     <string name="notification_channel_name">Verkada Pass Notification</string>
     <string name="notification_channel_description">Verkada Pass Notification Channel</string>
     <string name="service_notification_title">Verkada Pass Service</string>
     <string name="service_notification_text">The service is running</string>
+
+    <string name="sdk_initialization">SDK Initialization</string>
+    <string name="refresh_doors">Refresh doors</string>
+    <string name="reset_sdk">Reset SDK</string>
+    <string name="generate_challenge">Generate challenge</string>
+    <string name="generating_challenge">Generating challenge…</string>
+    <string name="copy_and_pass_to_your_backend_to_obtain_an_sdk_token">Copy and pass to your backend to obtain an SDK token.</string>
+    <string name="copied">Copied</string>
+    <string name="copy">Copy</string>
+    <string name="exchange_sdk_token">Exchange SDK token</string>
+    <string name="waiting_for_challenge">Waiting for challenge…</string>
+    <string name="paste_the_sdk_token_returned_by_your_backend">Paste the SDK token returned by your backend.</string>
+    <string name="sdk_configured_successfully">SDK configured successfully.</string>
+    <string name="paste_sdk_token_here">Paste sdk_token here…</string>
+    <string name="configure_sdk">Configure SDK</string>
+    <string name="step_complete">Step %1$d complete</string>
 </resources>

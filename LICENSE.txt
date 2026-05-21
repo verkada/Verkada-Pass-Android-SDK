@@ -1,0 +1,2 @@
+Copyright © 2026 Verkada Inc. All rights reserved.
+Use of this Software is subject to the terms of use in Verkada's End User Agreement available at https://legal.verkada.com/#eua

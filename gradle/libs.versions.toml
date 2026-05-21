@@ -3,21 +3,22 @@ agp = "9.1.0"
 hilt = "2.59.2"
 ksp = "2.3.5"
 android = "2.1.5"
-kotlin = "2.3.10"
+kotlin = "2.3.20"
 appcompat = "1.7.1"
 activityCompose = "1.13.0"
 composeBom = "2026.03.00"
 composeMaterial = "1.5.6"
 coreSplashscreen = "1.2.0"
-verkada-pass-ble = "0.0.1-SNAPSHOT"
+verkada-pass-ble = "0.0.2-SNAPSHOT"
 
 [libraries]
 android-tools-desugar = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "android" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
-androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-compose-material = { group = "androidx.wear.compose", name = "compose-material", version.ref = "composeMaterial" }
+androidx-compose-material-icons = { group = "androidx.compose.material", name = "material-icons-extended" }
+androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "coreSplashscreen" }
 google-dagger-hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
 google-dagger-hilt-android-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hilt" }
