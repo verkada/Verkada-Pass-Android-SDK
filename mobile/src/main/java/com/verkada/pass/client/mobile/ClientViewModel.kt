@@ -7,18 +7,25 @@ import androidx.annotation.RequiresPermission
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.verkada.android.pass.sdk.ble.VerkadaPassBle
+import com.verkada.android.pass.sdk.data.api.results.ConfigureError
+import com.verkada.android.pass.sdk.data.api.results.FetchDevicesError
+import com.verkada.android.pass.sdk.data.api.results.StartError
+import com.verkada.android.pass.sdk.data.api.results.onFailure
+import com.verkada.android.pass.sdk.data.api.results.onSuccess
 import com.verkada.android.pass.sdk.data.models.Shard
 import com.verkada.pass.client.mobile.ui.views.AppUiState
 import com.verkada.pass.client.mobile.ui.views.ButtonState
+import com.verkada.pass.client.mobile.ui.views.UiEvent
 import com.verkada.pass.client.mobile.ui.views.SdkInitUiState
 import com.verkada.pass.client.mobile.ui.views.SdkReadyUiState
 import com.verkada.pass.client.mobile.ui.views.StepState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -30,10 +37,14 @@ class ClientViewModel @Inject constructor(
     private val _uiState = MutableStateFlow<AppUiState>(AppUiState.Unknown)
     val uiState: StateFlow<AppUiState> = _uiState.asStateFlow()
 
+    private val _events = Channel<UiEvent>(Channel.BUFFERED)
+    val events = _events.receiveAsFlow()
+
     init {
         viewModelScope.launch {
             if (VerkadaPassBle.isConfigured(context)) {
                 _uiState.value = AppUiState.Ready()
+                _events.trySend(UiEvent.BuildServiceNotification)
             } else {
                 _uiState.value = AppUiState.Initializing(SdkInitUiState())
                 generateChallenge()
@@ -63,44 +74,58 @@ class ClientViewModel @Inject constructor(
     fun exchangeToken(sdkToken: String) {
         updateInitState { it.copy(exchangeButtonState = ButtonState.Loading) }
         viewModelScope.launch {
-            try {
-                VerkadaPassBle.configure(
-                    context = context,
-                    clientId = context.packageName,
-                    sdkToken = sdkToken,
-                    shard = Shard.US,
-                )
-                _uiState.value = AppUiState.Ready()
-            } catch (e: Exception) {
-                updateInitState { it.copy(exchangeButtonState = ButtonState.Idle) }
-            }
+            VerkadaPassBle.configure(
+                context = context,
+                clientId = context.packageName,
+                sdkToken = sdkToken,
+                shard = Shard.US,
+            )
+                .onSuccess {
+                    _uiState.value = AppUiState.Ready()
+                    _events.trySend(UiEvent.BuildServiceNotification)
+                }
+                .onFailure { error ->
+                    when (error) {
+                        is ConfigureError.MissingCodeVerifier -> {
+                            _events.trySend(UiEvent.ShowSnackbar("Error configuring SDK: Missing code verifier"))
+                        }
+                        is ConfigureError.Network -> {
+                            _events.trySend(UiEvent.ShowSnackbar("Network error configuring SDK: ${error.message}"))
+                        }
+                    }
+                    updateInitState { it.copy(exchangeButtonState = ButtonState.Idle) }
+                }
         }
     }
 
     fun refreshDoors() {
         updateReadyState { it.copy(refreshButtonState = ButtonState.Loading) }
         viewModelScope.launch {
-            try {
-                VerkadaPassBle.fetchDevices(context)
-                updateReadyState { it.copy(refreshButtonState = ButtonState.Idle) }
-            } catch (e: Exception) {
-                updateReadyState { it.copy(refreshButtonState = ButtonState.Idle) }
-            }
+            VerkadaPassBle.fetchDevices(context)
+                .onSuccess {
+                    _events.trySend(UiEvent.ShowSnackbar("Devices refreshed"))
+                }
+                .onFailure { error ->
+                    when (error) {
+                        is FetchDevicesError.MissingOrganizationId -> {
+                            _events.trySend(UiEvent.ShowSnackbar("Error fetching devices: Missing organization ID"))
+                        }
+                        is FetchDevicesError.Network -> {
+                            _events.trySend(UiEvent.ShowSnackbar("Network error fetching devices: ${error.message}"))
+                        }
+                    }
+                }
+            updateReadyState { it.copy(refreshButtonState = ButtonState.Idle) }
         }
     }
 
     fun resetSdk() {
         updateReadyState { it.copy(resetButtonState = ButtonState.Loading) }
         viewModelScope.launch {
-            delay(3000)
-            try {
-                VerkadaPassBle.stop(context)
-                VerkadaPassBle.clearConfiguration(context)
-                _uiState.value = AppUiState.Initializing(SdkInitUiState())
-                generateChallenge()
-            } catch (e: Exception) {
-                updateReadyState { it.copy(resetButtonState = ButtonState.Idle) }
-            }
+            VerkadaPassBle.stop(context)
+            VerkadaPassBle.clearConfiguration(context)
+            _uiState.value = AppUiState.Initializing(SdkInitUiState())
+            generateChallenge()
         }
     }
 
@@ -116,5 +141,13 @@ class ClientViewModel @Inject constructor(
             notificationId = 1,
             notification = notification
         )
+            .onSuccess {
+                _events.trySend(UiEvent.ShowSnackbar("BLE service started"))
+            }
+            .onFailure {
+                when (it) {
+                    is StartError.MissingUserId -> _events.trySend(UiEvent.ShowSnackbar("Error starting BLE service: Missing user ID"))
+                }
+            }
     }
 }

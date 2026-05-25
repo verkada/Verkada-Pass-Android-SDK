@@ -14,3 +14,8 @@ sealed class AppUiState {
     data class Initializing(val sdkInit: SdkInitUiState) : AppUiState()
     data class Ready(val state: SdkReadyUiState = SdkReadyUiState()) : AppUiState()
 }
+
+sealed class UiEvent {
+    object BuildServiceNotification : UiEvent()
+    data class ShowSnackbar(val message: String) : UiEvent()
+}
