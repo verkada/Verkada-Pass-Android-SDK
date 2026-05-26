@@ -45,7 +45,7 @@ class ClientViewModel @Inject constructor(
         viewModelScope.launch {
             if (VerkadaPassBle.isConfigured(context)) {
                 _uiState.value = AppUiState.Ready()
-                _events.trySend(UiEvent.BuildServiceNotification)
+                _events.trySend(BuildServiceNotification)
             } else {
                 _uiState.value = AppUiState.Initializing(SdkInitUiState())
                 generateChallenge()
@@ -111,15 +111,15 @@ class ClientViewModel @Inject constructor(
         viewModelScope.launch {
             VerkadaPassBle.fetchDevices(context)
                 .onSuccess {
-                    _events.trySend(UiEvent.ShowSnackbar("Devices refreshed"))
+                    _events.trySend(ShowSnackbar("Devices refreshed"))
                 }
                 .onFailure { error ->
                     when (error) {
                         is FetchDevicesError.MissingOrganizationId -> {
-                            _events.trySend(UiEvent.ShowSnackbar("Error fetching devices: Missing organization ID"))
+                            _events.trySend(ShowSnackbar("Error fetching devices: Missing organization ID"))
                         }
                         is FetchDevicesError.Network -> {
-                            _events.trySend(UiEvent.ShowSnackbar("Network error fetching devices: ${error.message}"))
+                            _events.trySend(ShowSnackbar("Network error fetching devices: ${error.message}"))
                         }
                     }
                 }
@@ -150,11 +150,11 @@ class ClientViewModel @Inject constructor(
             notification = notification
         )
             .onSuccess {
-                _events.trySend(UiEvent.ShowSnackbar("BLE service started"))
+                _events.trySend(ShowSnackbar("BLE service started"))
             }
             .onFailure {
                 when (it) {
-                    is StartError.MissingUserId -> _events.trySend(UiEvent.ShowSnackbar("Error starting BLE service: Missing user ID"))
+                    is StartError.MissingUserId -> _events.trySend(ShowSnackbar("Error starting BLE service: Missing user ID"))
                 }
             }
     }
