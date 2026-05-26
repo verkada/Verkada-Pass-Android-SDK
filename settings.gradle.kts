@@ -34,6 +34,7 @@ pluginManagement {
     }
 
     repositories {
+        mavenLocal()
         google {
             content {
                 includeGroupByRegex("com\\.android.*")
@@ -73,7 +74,6 @@ dependencyResolutionManagement {
 
 rootProject.name = "Verkada-Pass-Android-SDK"
 
-includeBuild("../Verkada-Pass-Android-SDK-Source")
 include(":mobile")
 include(":core")
 include(":wear")
