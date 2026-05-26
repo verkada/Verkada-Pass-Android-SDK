@@ -44,7 +44,6 @@ class WearClientViewModel @Inject constructor(
     private fun generateChallenge() {
         updateInitState { it.copy(step1 = StepState.InProgress) }
         viewModelScope.launch {
-            delay(3000) // @TODO: Remove
             val challenge = VerkadaPassBle.generateChallenge(context)
             updateInitState {
                 it.copy(
@@ -59,7 +58,6 @@ class WearClientViewModel @Inject constructor(
     fun exchangeToken(sdkToken: String) {
         updateInitState { it.copy(exchangeButtonState = ButtonState.Loading) }
         viewModelScope.launch {
-            delay(3000) // @TODO: Remove
             VerkadaPassBle.configure(
                 context = context,
                 clientId = context.packageName,
@@ -81,6 +79,21 @@ class WearClientViewModel @Inject constructor(
                             "Network error configuring SDK: ${error.message}",
                             Toast.LENGTH_LONG,
                         ).show()
+
+                        is ConfigureError.MissingOrganizationId -> {
+                            Toast.makeText(
+                                context,
+                                "Error configuring SDK: Missing organization ID",
+                                Toast.LENGTH_LONG,
+                            ).show()
+                        }
+                        is ConfigureError.MissingUserId -> {
+                            Toast.makeText(
+                                context,
+                                "Error configuring SDK: Missing user ID",
+                                Toast.LENGTH_LONG,
+                            ).show()
+                        }
                     }
                     updateInitState { it.copy(exchangeButtonState = ButtonState.Idle) }
                 }
@@ -90,7 +103,6 @@ class WearClientViewModel @Inject constructor(
     fun refreshDoors() {
         updateReadyState { it.copy(refreshButtonState = ButtonState.Loading) }
         viewModelScope.launch {
-            delay(3000) // @TODO: Remove
             VerkadaPassBle.fetchDevices(context)
                 .onFailure { error ->
                     when (error) {
@@ -113,7 +125,6 @@ class WearClientViewModel @Inject constructor(
     fun resetSdk() {
         updateReadyState { it.copy(resetButtonState = ButtonState.Loading) }
         viewModelScope.launch {
-            delay(3000) // @TODO: Remove
             VerkadaPassBle.stop(context)
             VerkadaPassBle.clearConfiguration(context)
             _uiState.value = AppUiState.Initializing(SdkInitUiState())

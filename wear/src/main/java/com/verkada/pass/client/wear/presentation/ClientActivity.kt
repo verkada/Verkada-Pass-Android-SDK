@@ -281,6 +281,20 @@ fun WearInitScreen(
             )
         }
 
+        if (state.challenge != null) {
+            item {
+                Text(
+                    text = state.challenge,
+                    style = MaterialTheme.typography.caption2,
+                    color = MaterialTheme.colors.onSurface.copy(alpha = 0.7f),
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 12.dp),
+                )
+            }
+        }
+
         // Step 2 — exchange SDK token via RemoteInput (voice or on-watch keyboard)
         item {
             Chip(
