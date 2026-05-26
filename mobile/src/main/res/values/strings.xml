@@ -21,4 +21,13 @@
     <string name="paste_sdk_token_here">Paste sdk_token here…</string>
     <string name="configure_sdk">Configure SDK</string>
     <string name="step_complete">Step %1$d complete</string>
+    <string name="error_starting_ble_service_missing_user_id">Error starting BLE service: Missing user ID</string>
+    <string name="ble_service_started">BLE service started</string>
+    <string name="network_error_fetching_devices">Network error fetching devices: %1$s</string>
+    <string name="error_fetching_devices_missing_organization_id">Error fetching devices: Missing organization ID</string>
+    <string name="devices_refreshed">Devices refreshed</string>
+    <string name="error_configuring_sdk_missing_user_id">Error configuring SDK: Missing user ID</string>
+    <string name="error_configuring_sdk_missing_organization_id">Error configuring SDK: Missing organization ID</string>
+    <string name="network_error_configuring_sdk">Network error configuring SDK: %1$s</string>
+    <string name="error_configuring_sdk_missing_code_verifier">Error configuring SDK: Missing code verifier</string>
 </resources>

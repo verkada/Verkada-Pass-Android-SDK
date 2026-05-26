@@ -3,22 +3,26 @@ package com.verkada.pass.client.wear.presentation
 import android.Manifest
 import android.app.Notification
 import android.content.Context
-import android.widget.Toast
 import androidx.annotation.RequiresPermission
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.verkada.android.pass.sdk.ble.VerkadaPassBle
 import com.verkada.android.pass.sdk.data.api.results.ConfigureError
 import com.verkada.android.pass.sdk.data.api.results.FetchDevicesError
+import com.verkada.android.pass.sdk.data.api.results.StartError
 import com.verkada.android.pass.sdk.data.api.results.onFailure
 import com.verkada.android.pass.sdk.data.api.results.onSuccess
 import com.verkada.android.pass.sdk.data.models.Shard
+import com.verkada.pass.client.wear.R
+import com.verkada.pass.client.wear.presentation.UiEvent.BuildServiceNotification
+import com.verkada.pass.client.wear.presentation.UiEvent.ShowToast
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -30,15 +34,24 @@ class WearClientViewModel @Inject constructor(
     private val _uiState = MutableStateFlow<AppUiState>(AppUiState.Unknown)
     val uiState: StateFlow<AppUiState> = _uiState.asStateFlow()
 
+    private val _events = Channel<UiEvent>(Channel.BUFFERED)
+    val events = _events.receiveAsFlow()
+
     init {
         viewModelScope.launch {
             if (VerkadaPassBle.isConfigured(context)) {
                 _uiState.value = AppUiState.Ready()
+                _events.trySend(BuildServiceNotification)
             } else {
                 _uiState.value = AppUiState.Initializing(SdkInitUiState())
                 generateChallenge()
             }
         }
+    }
+
+    private fun updateInitState(update: (SdkInitUiState) -> SdkInitUiState) {
+        val current = _uiState.value as? AppUiState.Initializing ?: return
+        _uiState.value = current.copy(sdkInit = update(current.sdkInit))
     }
 
     private fun generateChallenge() {
@@ -66,33 +79,31 @@ class WearClientViewModel @Inject constructor(
             )
                 .onSuccess {
                     _uiState.value = AppUiState.Ready()
+                    _events.trySend(BuildServiceNotification)
                 }
                 .onFailure { error ->
                     when (error) {
-                        is ConfigureError.MissingCodeVerifier -> Toast.makeText(
-                            context,
-                            "Error configuring SDK: Missing code verifier",
-                            Toast.LENGTH_LONG,
-                        ).show()
-                        is ConfigureError.Network -> Toast.makeText(
-                            context,
-                            "Network error configuring SDK: ${error.message}",
-                            Toast.LENGTH_LONG,
-                        ).show()
+                        is ConfigureError.MissingCodeVerifier -> {
+                            _events.trySend(ShowToast(context.getString(R.string.error_configuring_sdk_missing_code_verifier)))
+                        }
+
+                        is ConfigureError.Network -> {
+                            _events.trySend(
+                                ShowToast(
+                                    context.getString(
+                                        R.string.network_error_configuring_sdk,
+                                        error.message
+                                    )
+                                )
+                            )
+                        }
 
                         is ConfigureError.MissingOrganizationId -> {
-                            Toast.makeText(
-                                context,
-                                "Error configuring SDK: Missing organization ID",
-                                Toast.LENGTH_LONG,
-                            ).show()
+                            _events.trySend(ShowToast(context.getString(R.string.error_configuring_sdk_missing_organization_id)))
                         }
+
                         is ConfigureError.MissingUserId -> {
-                            Toast.makeText(
-                                context,
-                                "Error configuring SDK: Missing user ID",
-                                Toast.LENGTH_LONG,
-                            ).show()
+                            _events.trySend(ShowToast(context.getString(R.string.error_configuring_sdk_missing_user_id)))
                         }
                     }
                     updateInitState { it.copy(exchangeButtonState = ButtonState.Idle) }
@@ -104,18 +115,25 @@ class WearClientViewModel @Inject constructor(
         updateReadyState { it.copy(refreshButtonState = ButtonState.Loading) }
         viewModelScope.launch {
             VerkadaPassBle.fetchDevices(context)
+                .onSuccess {
+                    _events.trySend(ShowToast(context.getString(R.string.devices_refreshed)))
+                }
                 .onFailure { error ->
                     when (error) {
-                        is FetchDevicesError.MissingOrganizationId -> Toast.makeText(
-                            context,
-                            "Error fetching devices: Missing organization ID",
-                            Toast.LENGTH_LONG,
-                        ).show()
-                        is FetchDevicesError.Network -> Toast.makeText(
-                            context,
-                            "Network error fetching devices: ${error.message}",
-                            Toast.LENGTH_LONG,
-                        ).show()
+                        is FetchDevicesError.MissingOrganizationId -> {
+                            _events.trySend(ShowToast(context.getString(R.string.error_fetching_devices_missing_organization_id)))
+                        }
+
+                        is FetchDevicesError.Network -> {
+                            _events.trySend(
+                                ShowToast(
+                                    context.getString(
+                                        R.string.network_error_fetching_devices,
+                                        error.message
+                                    )
+                                )
+                            )
+                        }
                     }
                 }
             updateReadyState { it.copy(refreshButtonState = ButtonState.Idle) }
@@ -132,11 +150,6 @@ class WearClientViewModel @Inject constructor(
         }
     }
 
-    private fun updateInitState(update: (SdkInitUiState) -> SdkInitUiState) {
-        val current = _uiState.value as? AppUiState.Initializing ?: return
-        _uiState.value = current.copy(sdkInit = update(current.sdkInit))
-    }
-
     private fun updateReadyState(update: (SdkReadyUiState) -> SdkReadyUiState) {
         val current = _uiState.value as? AppUiState.Ready ?: return
         _uiState.value = current.copy(state = update(current.state))
@@ -149,5 +162,13 @@ class WearClientViewModel @Inject constructor(
             notificationId = 1,
             notification = notification,
         )
+            .onSuccess {
+                _events.trySend(ShowToast(context.getString(R.string.ble_service_started)))
+            }
+            .onFailure {
+                when (it) {
+                    is StartError.MissingUserId -> _events.trySend(ShowToast(context.getString(R.string.error_starting_ble_service_missing_user_id)))
+                }
+            }
     }
 }

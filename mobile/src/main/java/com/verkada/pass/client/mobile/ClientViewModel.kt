@@ -15,11 +15,12 @@ import com.verkada.android.pass.sdk.data.api.results.onSuccess
 import com.verkada.android.pass.sdk.data.models.Shard
 import com.verkada.pass.client.mobile.ui.views.AppUiState
 import com.verkada.pass.client.mobile.ui.views.ButtonState
-import com.verkada.pass.client.mobile.ui.views.UiEvent
 import com.verkada.pass.client.mobile.ui.views.SdkInitUiState
 import com.verkada.pass.client.mobile.ui.views.SdkReadyUiState
 import com.verkada.pass.client.mobile.ui.views.StepState
-import com.verkada.pass.client.mobile.ui.views.UiEvent.*
+import com.verkada.pass.client.mobile.ui.views.UiEvent
+import com.verkada.pass.client.mobile.ui.views.UiEvent.BuildServiceNotification
+import com.verkada.pass.client.mobile.ui.views.UiEvent.ShowSnackbar
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.channels.Channel
@@ -88,17 +89,26 @@ class ClientViewModel @Inject constructor(
                 .onFailure { error ->
                     when (error) {
                         is ConfigureError.MissingCodeVerifier -> {
-                            _events.trySend(ShowSnackbar("Error configuring SDK: Missing code verifier"))
+                            _events.trySend(ShowSnackbar(context.getString(R.string.error_configuring_sdk_missing_code_verifier)))
                         }
+
                         is ConfigureError.Network -> {
-                            _events.trySend(ShowSnackbar("Network error configuring SDK: ${error.message}"))
+                            _events.trySend(
+                                ShowSnackbar(
+                                    context.getString(
+                                        R.string.network_error_configuring_sdk,
+                                        error.message
+                                    )
+                                )
+                            )
                         }
 
                         is ConfigureError.MissingOrganizationId -> {
-                            _events.trySend(ShowSnackbar("Error configuring SDK: Missing organization ID"))
+                            _events.trySend(ShowSnackbar(context.getString(R.string.error_configuring_sdk_missing_organization_id)))
                         }
+
                         is ConfigureError.MissingUserId -> {
-                            _events.trySend(ShowSnackbar("Error configuring SDK: Missing user ID"))
+                            _events.trySend(ShowSnackbar(context.getString(R.string.error_configuring_sdk_missing_user_id)))
                         }
                     }
                     updateInitState { it.copy(exchangeButtonState = ButtonState.Idle) }
@@ -111,15 +121,23 @@ class ClientViewModel @Inject constructor(
         viewModelScope.launch {
             VerkadaPassBle.fetchDevices(context)
                 .onSuccess {
-                    _events.trySend(ShowSnackbar("Devices refreshed"))
+                    _events.trySend(ShowSnackbar(context.getString(R.string.devices_refreshed)))
                 }
                 .onFailure { error ->
                     when (error) {
                         is FetchDevicesError.MissingOrganizationId -> {
-                            _events.trySend(ShowSnackbar("Error fetching devices: Missing organization ID"))
+                            _events.trySend(ShowSnackbar(context.getString(R.string.error_fetching_devices_missing_organization_id)))
                         }
+
                         is FetchDevicesError.Network -> {
-                            _events.trySend(ShowSnackbar("Network error fetching devices: ${error.message}"))
+                            _events.trySend(
+                                ShowSnackbar(
+                                    context.getString(
+                                        R.string.network_error_fetching_devices,
+                                        error.message
+                                    )
+                                )
+                            )
                         }
                     }
                 }
@@ -150,11 +168,11 @@ class ClientViewModel @Inject constructor(
             notification = notification
         )
             .onSuccess {
-                _events.trySend(ShowSnackbar("BLE service started"))
+                _events.trySend(ShowSnackbar(context.getString(R.string.ble_service_started)))
             }
             .onFailure {
                 when (it) {
-                    is StartError.MissingUserId -> _events.trySend(ShowSnackbar("Error starting BLE service: Missing user ID"))
+                    is StartError.MissingUserId -> _events.trySend(ShowSnackbar(context.getString(R.string.error_starting_ble_service_missing_user_id)))
                 }
             }
     }
