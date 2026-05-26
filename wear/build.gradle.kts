@@ -42,7 +42,9 @@ android {
 }
 
 dependencies {
+    implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.material)
+    implementation(libs.androidx.compose.material.icons)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.google.dagger.hilt.android)
@@ -51,6 +53,10 @@ dependencies {
 
     implementation(libs.verkada.pass.ble)
     ksp(libs.google.dagger.hilt.android.compiler)
+
+    implementation(libs.androidx.wear.input)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.lifecycle.runtime.compose)
 
     implementation(project(":core"))
 }
