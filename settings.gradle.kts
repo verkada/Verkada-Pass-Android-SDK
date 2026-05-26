@@ -71,9 +71,9 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Verkada-Pass-Android-SDK-Sample"
+rootProject.name = "Verkada-Pass-Android-SDK"
 
-includeBuild("../Verkada-Pass-Android-SDK")
+includeBuild("../Verkada-Pass-Android-SDK-Source")
 include(":mobile")
 include(":core")
 include(":wear")
