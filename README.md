@@ -6,7 +6,6 @@ The Verkada Pass Android SDK enables host applications to authenticate users aga
 
 - Android API 23+
 - The host application must be annotated with `@HiltAndroidApp`
-- Bluetooth permissions declared in `AndroidManifest.xml`
 
 ## Installation
 
@@ -17,6 +16,7 @@ In `settings.gradle.kts`:
 ```kotlin
 dependencyResolutionManagement {
     repositories {
+        maven { url = uri("https://www.jitpack.io") }
         maven {
             url = uri("https://maven.pkg.github.com/verkada/Verkada-Pass-Android-SDK")
             credentials {

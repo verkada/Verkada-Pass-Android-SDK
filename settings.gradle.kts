@@ -53,20 +53,11 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
         maven { url = uri("https://www.jitpack.io") }
-
-        exclusiveContent {
-            forRepository {
-                maven {
-                    url = uri("https://maven.pkg.github.com/verkada/Verkada-Pass-Android-SDK")
-                    credentials {
-                        username = settings.extra["_githubUser"] as? String
-                        password = settings.extra["_githubPassword"] as? String
-                    }
-                }
-            }
-
-            filter {
-                includeGroupByRegex("com\\.verkada\\..*")
+        maven {
+            url = uri("https://maven.pkg.github.com/verkada/Verkada-Pass-Android-SDK")
+            credentials {
+                username = settings.extra["_githubUser"] as? String
+                password = settings.extra["_githubPassword"] as? String
             }
         }
     }
