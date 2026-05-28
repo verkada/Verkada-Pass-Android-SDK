@@ -5,7 +5,6 @@ The Verkada Pass Android SDK enables host applications to authenticate users aga
 ## Requirements
 
 - Android API 23+
-- The host application must be annotated with `@HiltAndroidApp`
 
 ## Installation
 
