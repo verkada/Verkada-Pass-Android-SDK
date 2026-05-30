@@ -7,12 +7,12 @@ import androidx.annotation.RequiresPermission
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.verkada.android.pass.sdk.ble.VerkadaPassBle
+import com.verkada.android.pass.sdk.data.api.models.Shard
 import com.verkada.android.pass.sdk.data.api.results.ConfigureError
 import com.verkada.android.pass.sdk.data.api.results.FetchDevicesError
 import com.verkada.android.pass.sdk.data.api.results.StartError
 import com.verkada.android.pass.sdk.data.api.results.onFailure
 import com.verkada.android.pass.sdk.data.api.results.onSuccess
-import com.verkada.android.pass.sdk.data.models.Shard
 import com.verkada.pass.client.mobile.ui.views.AppUiState
 import com.verkada.pass.client.mobile.ui.views.ButtonState
 import com.verkada.pass.client.mobile.ui.views.SdkInitUiState
