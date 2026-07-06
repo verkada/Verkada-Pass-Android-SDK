@@ -8,7 +8,9 @@ The Verkada Pass Android SDK enables host applications to authenticate users aga
 
 ## Installation
 
-Add the GitHub Packages repository and the SDK dependency to your project.
+The Verkada Pass SDK requires a dedicated API token. Contact [Verkada support](mailto:support@verkada.com) to request one.
+
+Once you have a token, add the GitHub Packages repository to your project, then add the SDK as a dependency.
 
 In `settings.gradle.kts`:
 

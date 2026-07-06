@@ -134,6 +134,10 @@ class WearClientViewModel @Inject constructor(
                                 )
                             )
                         }
+
+                        is FetchDevicesError.MissingUserId -> {
+                            _events.trySend(ShowToast(context.getString(R.string.error_fetching_devices_missing_user_id)))
+                        }
                     }
                 }
             updateReadyState { it.copy(refreshButtonState = ButtonState.Idle) }

@@ -10,7 +10,7 @@ composeBom = "2026.03.00"
 composeMaterial = "1.5.6"
 coreSplashscreen = "1.2.0"
 lifecycleCompose = "2.8.7"
-verkada-pass-ble = "0.1.0"
+verkada-pass-ble = "0.1.1"
 
 [libraries]
 android-tools-desugar = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "android" }

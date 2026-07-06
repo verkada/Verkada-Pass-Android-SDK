@@ -32,6 +32,7 @@
     <string name="ble_service_started">BLE service started</string>
     <string name="network_error_fetching_devices">Network error fetching devices: %1$s</string>
     <string name="error_fetching_devices_missing_organization_id">Error fetching devices: Missing organization ID</string>
+    <string name="error_fetching_devices_missing_user_id">Error fetching devices: Missing user ID</string>
     <string name="devices_refreshed">Devices refreshed</string>
     <string name="error_configuring_sdk_missing_user_id">Error configuring SDK: Missing user ID</string>
     <string name="error_configuring_sdk_missing_organization_id">Error configuring SDK: Missing organization ID</string>
