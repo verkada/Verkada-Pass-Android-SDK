@@ -143,6 +143,17 @@ class ClientViewModel @Inject constructor(
                         is FetchDevicesError.MissingUserId -> {
                             _events.trySend(ShowSnackbar(context.getString(R.string.error_fetching_devices_missing_user_id)))
                         }
+
+                        is FetchDevicesError.Aggregated -> {
+                            _events.trySend(
+                                ShowSnackbar(
+                                    context.getString(
+                                        R.string.error_fetching_devices_aggregated,
+                                        error.errors.joinToString(", ") { it::class.simpleName ?: "Unknown" }
+                                    )
+                                )
+                            )
+                        }
                     }
                 }
             updateReadyState { it.copy(refreshButtonState = ButtonState.Idle) }
