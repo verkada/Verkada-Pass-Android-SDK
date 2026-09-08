@@ -35,7 +35,7 @@ In your module's `build.gradle.kts`:
 
 ```kotlin
 dependencies {
-    implementation("com.verkada.android.pass.sdk:ble:0.2.0")
+    implementation("com.verkada.android.pass.sdk:ble:0.2.3")
 }
 ```
 
@@ -257,6 +257,7 @@ The SDK supports two complementary unlock paths:
 | `Shard.EU` | Europe |
 | `Shard.AU` | Australia |
 | `Shard.GOV` | US Government |
+| `Shard.OHIO` | United States (Ohio) |
 
 ### `DoorSection`
 
