@@ -35,7 +35,7 @@ In your module's `build.gradle.kts`:
 
 ```kotlin
 dependencies {
-    implementation("com.verkada.android.pass.sdk:ble:0.2.3")
+    implementation("com.verkada.android.pass.sdk:ble:0.2.4")
 }
 ```
 
