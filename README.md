@@ -10,7 +10,7 @@ The Verkada Pass Android SDK enables host applications to authenticate users aga
 
 ## Installation
 
-The Verkada Pass SDK requires a dedicated API token. Contact [Verkada support](mailto:support@verkada.com) to request one.
+A special API token is required to use the Verkada Pass SDK. If you are interested in implementing this SDK, see the [Verkada API documentation](https://apidocs.verkada.com/reference/introduction-1).
 
 Once you have a token, add the GitHub Packages repository to your project, then add the SDK as a dependency.
 
