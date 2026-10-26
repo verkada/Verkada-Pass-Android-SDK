@@ -53,6 +53,55 @@ The SDK declares its Bluetooth and location permissions in its manifest; your ap
 
 `ACCESS_COARSE_LOCATION` is also declared in the manifest but doesn't need to be requested separately if `ACCESS_FINE_LOCATION` is granted.
 
+## WorkManager setup
+
+The SDK uses `WorkManager` internally to run background work. `WorkManager`'s configuration is owned by the whole app process, not by any one library in it — so the SDK does not, and cannot safely, initialize `WorkManager` on your behalf. Your app must supply the SDK's `WorkerFactory` through its own `WorkManager` `Configuration`.
+
+If your app doesn't already configure `WorkManager`, implement `Configuration.Provider` and pass the SDK's factory through:
+
+```kotlin
+import android.app.Application
+import androidx.work.Configuration
+import com.verkada.android.pass.sdk.ble.VerkadaPassBle
+
+class MyApplication : Application(), Configuration.Provider {
+    override val workManagerConfiguration: Configuration
+        get() = Configuration.Builder()
+            .setWorkerFactory(VerkadaPassBle.workerFactory(this))
+            .build()
+}
+```
+
+If your app already supplies its own `WorkerFactory` (for example via Hilt), merge the SDK's factory in with `DelegatingWorkerFactory` instead of replacing yours:
+
+```kotlin
+import android.app.Application
+import androidx.hilt.work.HiltWorkerFactory
+import androidx.work.Configuration
+import androidx.work.DelegatingWorkerFactory
+import com.verkada.android.pass.sdk.ble.VerkadaPassBle
+import dagger.hilt.android.HiltAndroidApp
+import javax.inject.Inject
+
+@HiltAndroidApp
+class MyApplication : Application(), Configuration.Provider {
+    @Inject
+    lateinit var hiltWorkerFactory: HiltWorkerFactory
+
+    override val workManagerConfiguration: Configuration
+        get() = Configuration.Builder()
+            .setWorkerFactory(
+                DelegatingWorkerFactory().apply {
+                    addFactory(hiltWorkerFactory)
+                    addFactory(VerkadaPassBle.workerFactory(this@MyApplication))
+                }
+            )
+            .build()
+}
+```
+
+> **Upgrading from an earlier SDK version?** `WorkManager` initialization used to happen automatically and this step wasn't required. That's no longer the case — if you don't add this `Configuration.Provider` setup, the SDK won't crash, but some of its background work will silently never run.
+
 ## Usage
 
 ### 1. Generate a challenge
@@ -204,11 +253,13 @@ viewModelScope.launch {
 
 ### 7. Stop BLE
 
-Stop the foreground service when BLE is no longer needed.
+Stop the foreground service when BLE is no longer needed. This also stops nearby-device detection — any active `nearbyDevices(context)` collector will stop receiving updates until BLE is started again.
 
 ```kotlin
 VerkadaPassBle.stop(context)
 ```
+
+Nearby-device detection also stops automatically whenever there are no active collectors of `nearbyDevices(context)`, so you don't need to call `stop()` just to pause it — it winds down a few seconds after the last observer goes away, and restarts the next time something collects it.
 
 ### 8. Clear configuration
 
@@ -245,9 +296,10 @@ The SDK supports two complementary unlock paths:
 | `fetchDevices(context)` | `SdkResult<List<DoorSection>, FetchDevicesError>` | Fetches and caches the list of readers the user can unlock, grouped by building and floor. |
 | `unlockDevice(context, doorRow)` | `SdkResult<Int?, RemoteUnlockError>` | Remotely unlocks the given door or elevator. Returns the unlock duration in seconds. Updates `doorRow.lockState` automatically. |
 | `start(context, notificationId, notification)` | `SdkResult<Unit, StartError>` | Starts the BLE foreground service for automatic proximity unlock. |
-| `nearbyDevices(context)` | `StateFlow<DoorSection>` | Emits the doors/elevators currently detected nearby over BLE. Reflects live proximity; independent of the automatic BLE unlock flow. |
-| `stop(context)` | `Unit` | Stops the BLE foreground service. |
+| `nearbyDevices(context)` | `StateFlow<DoorSection>` | Emits the doors/elevators currently detected nearby over BLE. Reflects live proximity; independent of the automatic BLE unlock flow. Detection starts when the first collector subscribes and stops automatically a few seconds after the last one unsubscribes. |
+| `stop(context)` | `Unit` | Stops the BLE foreground service and nearby-device detection. |
 | `clearConfiguration(context)` | `SdkResult<Unit, ClearConfigurationError>` | Clears all cached credentials and stops BLE. |
+| `workerFactory(context)` | `WorkerFactory` | Returns the SDK's `WorkerFactory`. Add it to your app's `WorkManager` `Configuration` — see [WorkManager setup](#workmanager-setup). Required for the SDK's background work to run. |
 
 ### `Shard`
 

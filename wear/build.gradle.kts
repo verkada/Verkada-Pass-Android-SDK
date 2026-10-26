@@ -48,6 +48,8 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.google.dagger.hilt.android)
+    implementation(libs.androidx.hilt.hilt.work)
+    implementation(libs.androidx.work.runtime.ktx)
 
     coreLibraryDesugaring(libs.android.tools.desugar)
 

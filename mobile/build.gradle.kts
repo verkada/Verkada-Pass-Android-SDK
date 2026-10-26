@@ -47,6 +47,8 @@ dependencies {
     implementation(libs.androidx.compose.material.icons)
     implementation(libs.androidx.compose.material3)
     implementation(libs.google.dagger.hilt.android)
+    implementation(libs.androidx.hilt.hilt.work)
+    implementation(libs.androidx.work.runtime.ktx)
 
     coreLibraryDesugaring(libs.android.tools.desugar)
 
