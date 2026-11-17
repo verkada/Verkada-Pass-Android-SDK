@@ -259,8 +259,6 @@ Stop the foreground service when BLE is no longer needed. This also stops nearby
 VerkadaPassBle.stop(context)
 ```
 
-Nearby-device detection also stops automatically whenever there are no active collectors of `nearbyDevices(context)`, so you don't need to call `stop()` just to pause it — it winds down a few seconds after the last observer goes away, and restarts the next time something collects it.
-
 ### 8. Clear configuration
 
 Clear all cached credentials. After this call `isConfigured` returns `false` and `configure()` must be called again before the next session.
