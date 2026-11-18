@@ -35,7 +35,7 @@ In your module's `build.gradle.kts`:
 
 ```kotlin
 dependencies {
-    implementation("com.verkada.android.pass.sdk:ble:1.1.3")
+    implementation("com.verkada.android.pass.sdk:ble:1.2.0")
 }
 ```
 
@@ -258,8 +258,6 @@ Stop the foreground service when BLE is no longer needed. This also stops nearby
 ```kotlin
 VerkadaPassBle.stop(context)
 ```
-
-Nearby-device detection also stops automatically whenever there are no active collectors of `nearbyDevices(context)`, so you don't need to call `stop()` just to pause it — it winds down a few seconds after the last observer goes away, and restarts the next time something collects it.
 
 ### 8. Clear configuration
 
